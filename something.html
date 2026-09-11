@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a0928">
+    <title>Mahmoud & Afsana — Under the Same Blossoms to the Stars</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #110d18;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f7eef5;
+            position: fixed;
+            inset: 0;
+        }
+
+        #scene {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        /* Ambient Grain & Glow Overlay */
+        .ambient-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: radial-gradient(circle at 50% 30%, transparent 35%, rgba(14, 8, 24, 0.45) 100%);
+            mix-blend-mode: multiply;
+        }
+
+        /* Border Frame with Safe Area Insets */
+        .frame {
+            position: fixed;
+            inset: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+            border: 1px solid rgba(243, 196, 219, 0.16);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 3;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.8s ease;
+        }
+
+        /* Top Header Bar */
+        .topbar {
+            position: fixed;
+            top: max(16px, env(safe-area-inset-top) + 8px);
+            left: max(16px, env(safe-area-inset-left) + 8px);
+            right: max(16px, env(safe-area-inset-right) + 8px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 30px;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #fae4ee;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .brand-pill .sparkle {
+            color: #d18ff5;
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+            flex-wrap: nowrap;
+        }
+
+        .audio-btn,
+        .chapter-tag {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 30px;
+            color: #fae6f2;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .audio-btn:hover,
+        .audio-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Story Heading */
+        .heading {
+            position: fixed;
+            top: clamp(62px, 11vh, 110px);
+            left: max(16px, env(safe-area-inset-left) + 8px);
+            right: max(16px, env(safe-area-inset-right) + 8px);
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .heading.changing {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: clamp(9px, 2.4vw, 11px);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #d5a3be;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(22px, 5.2vw, 48px);
+            line-height: 1.18;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            text-shadow: 0 3px 18px rgba(0, 0, 0, 0.7);
+        }
+
+        .subtitle {
+            margin: 6px auto 0;
+            max-width: 480px;
+            font-size: clamp(12px, 3.2vw, 15px);
+            line-height: 1.5;
+            color: #e3cddb;
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Bottom Controls Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: max(18px, env(safe-area-inset-bottom) + 10px);
+            left: max(16px, env(safe-area-inset-left) + 8px);
+            right: max(16px, env(safe-area-inset-right) + 8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .next-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 10px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 50px;
+            background: rgba(30, 18, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #fff;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(210, 130, 240, 0.25);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-width: 90vw;
+        }
+
+        .next-btn:hover,
+        .next-btn:active {
+            background: rgba(45, 25, 65, 0.9);
+            border-color: rgba(220, 150, 255, 0.5);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(210, 130, 240, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .next-btn:disabled {
+            cursor: default;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .next-icon {
+            display: grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 13px;
+            color: #fce8f4;
+            flex-shrink: 0;
+        }
+
+        .next-text {
+            font-size: clamp(10.5px, 2.8vw, 12px);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Progress Dots */
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .progress-indicator span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.35s ease;
+        }
+
+        .progress-indicator span.active {
+            width: 20px;
+            border-radius: 10px;
+            background: #d687ee;
+            box-shadow: 0 0 10px #d687ee;
+        }
+
+        /* Reset Button */
+        .reset-btn {
+            position: fixed;
+            right: max(16px, env(safe-area-inset-right) + 8px);
+            bottom: max(18px, env(safe-area-inset-bottom) + 10px);
+            z-index: 11;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #e6cede;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            pointer-events: auto;
+        }
+
+        .reset-btn:hover,
+        .reset-btn:active {
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* PROPOSAL MODAL POPUP */
+        .proposal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 4, 18, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            padding: 16px;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .proposal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .proposal-card {
+            width: 100%;
+            max-width: 440px;
+            max-height: 88vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: linear-gradient(135deg, rgba(38, 18, 56, 0.92) 0%, rgba(20, 10, 32, 0.97) 100%);
+            border: 1.5px solid rgba(197, 122, 240, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(168, 85, 247, 0.3);
+            border-radius: 24px;
+            padding: clamp(24px, 6vw, 36px) clamp(18px, 5vw, 28px);
+            text-align: center;
+            position: relative;
+            transform: scale(0.92) translateY(15px);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .proposal-overlay.active .proposal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .bts-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: linear-gradient(90deg, #9333ea, #c084fc);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: #fff;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+        }
+
+        .proposal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(20px, 5.2vw, 30px);
+            color: #ffffff;
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .proposal-desc {
+            font-size: clamp(13px, 3.4vw, 15px);
+            color: #d8b4e2;
+            line-height: 1.55;
+            margin-bottom: 24px;
+        }
+
+        .proposal-actions {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 72px;
+            width: 100%;
+        }
+
+        .btn-yes {
+            padding: 12px 30px;
+            font-size: clamp(14px, 3.8vw, 16px);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #fff;
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4), 0 0 15px rgba(168, 85, 247, 0.4);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse-yes 2s infinite ease-in-out;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .btn-yes:hover,
+        .btn-yes:active {
+            transform: scale(1.06);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.6), 0 0 25px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-no {
+            padding: 12px 26px;
+            font-size: clamp(13px, 3.5vw, 15px);
+            font-weight: 600;
+            color: #bfa7c5;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s;
+            z-index: 10;
+            flex-shrink: 0;
+            touch-action: none;
+        }
+
+        .btn-no:hover,
+        .btn-no:active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .no-taunt {
+            margin-top: 14px;
+            font-size: clamp(11px, 2.8vw, 13px);
+            color: #f472b6;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            min-height: 18px;
+        }
+
+        .no-taunt.active {
+            opacity: 1;
+        }
+
+        /* HAPPY LOVE ENDING CELEBRATION MODAL / CARD */
+        .celebration-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            padding: 16px;
+            transition: opacity 0.7s ease;
+        }
+
+        .celebration-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .celebration-card {
+            background: linear-gradient(135deg, rgba(46, 17, 68, 0.94) 0%, rgba(20, 8, 35, 0.98) 100%);
+            border: 2px solid rgba(244, 114, 182, 0.45);
+            border-radius: 28px;
+            padding: clamp(28px, 6vw, 42px) clamp(18px, 5vw, 32px);
+            max-width: 480px;
+            width: 100%;
+            max-height: 88vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.75), 0 0 50px rgba(236, 72, 153, 0.45);
+            transform: scale(0.88);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .celebration-overlay.active .celebration-card {
+            transform: scale(1);
+        }
+
+        .heart-icon-badge {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            display: grid;
+            place-items: center;
+            font-size: 30px;
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+            animation: bounce-heart 1.6s infinite ease-in-out;
+        }
+
+        .celebration-names {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(24px, 6vw, 38px);
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            text-shadow: 0 0 18px rgba(236, 72, 153, 0.5);
+        }
+
+        .celebration-subtitle {
+            font-size: clamp(13px, 3.4vw, 15px);
+            color: #f3c2e7;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        .celebration-quote {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            border-left: 3px solid #ec4899;
+            font-style: italic;
+            font-size: clamp(12.5px, 3.3vw, 14.5px);
+            color: #fae4f4;
+            line-height: 1.55;
+            margin-bottom: 22px;
+            text-align: left;
+        }
+
+        .replay-btn {
+            padding: 12px 28px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #9333ea, #ec4899);
+            border: none;
+            color: #fff;
+            font-size: clamp(12px, 3.2vw, 13.5px);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        .replay-btn:hover,
+        .replay-btn:active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.6);
+        }
+
+        /* Keyframes */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        @keyframes pulse-yes {
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4), 0 0 15px rgba(168, 85, 247, 0.4); }
+            50% { transform: scale(1.04); box-shadow: 0 10px 28px rgba(236, 72, 153, 0.6), 0 0 28px rgba(168, 85, 247, 0.6); }
+        }
+
+        @keyframes bounce-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12) rotate(4deg); }
+        }
+
+        /* Narrow mobile tweaks (<420px) */
+        @media (max-width: 420px) {
+            .brand-pill {
+                padding: 4px 8px;
+                font-size: 9.5px;
+            }
+            .audio-btn,
+            .chapter-tag {
+                padding: 4px 8px;
+                font-size: 9.5px;
+            }
+            .next-btn {
+                padding: 8px 16px;
+                min-height: 44px;
+            }
+            .reset-btn {
+                padding: 6px 10px;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Animated Canvas -->
+    <canvas id="scene" role="img" aria-label="Animated story of Mahmoud and Afsana from spring blossoms to flower paradise and a BTS concert date proposal."></canvas>
+
+    <div class="ambient-overlay"></div>
+    <div class="frame" id="border-frame"></div>
+
+    <!-- Header -->
+    <header class="topbar">
+        <div class="brand-pill">
+            <span class="sparkle">✦</span>
+            <span>Mahmoud &amp; Afsana</span>
+        </div>
+
+        <div class="top-controls">
+            <button class="audio-btn" id="audio-toggle" type="button" aria-label="Toggle Sound">
+                <span id="audio-icon">♪</span>
+                <span id="audio-status">Sound</span>
+            </button>
+            <div class="chapter-tag" id="chapter-label">01 / Tree</div>
+        </div>
+    </header>
+
+    <!-- Dynamic Story Heading -->
+    <div class="heading" id="heading">
+        <p class="eyebrow" id="eyebrow">A Small Story of Spring</p>
+        <h1 id="title">A quiet afternoon<br>among the blossoms.</h1>
+        <p class="subtitle" id="subtitle">Mahmoud rests peacefully high in the tree branches, dreaming under the pink petals.</p>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-bar">
+        <button class="next-btn" id="next" type="button">
+            <span class="next-icon" id="next-symbol" aria-hidden="true">+</span>
+            <span class="next-text" id="next-text">Tap anywhere to wake Mahmoud</span>
+        </button>
+
+        <div class="progress-indicator" id="progress-dots" aria-hidden="true">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <button class="reset-btn" id="reset" type="button" hidden>↺ Begin Again</button>
+
+    <!-- PROPOSAL POPUP MODAL -->
+    <div class="proposal-overlay" id="proposal-modal">
+        <div class="proposal-card">
+            <div class="bts-badge">✦ BTS WORLD TOUR SPECIAL ✦</div>
+            <h2 class="proposal-title">A Question Under Purple Lights</h2>
+            <p class="proposal-desc">
+                Surrounded by thousands of glowing purple ARMY bombs and BTS music echoing across the stadium, <strong>Mahmoud</strong> turns to <strong>Afsana</strong> with all his heart...
+                <br><br>
+                <em style="color:#fce7f3; font-size: 1.12em;">"Afsana, will you go on a date with me? 💜"</em>
+            </p>
+
+            <div class="proposal-actions" id="actions-box">
+                <button class="btn-yes" id="btn-yes" type="button">YES! 💖</button>
+                <button class="btn-no" id="btn-no" type="button">NO</button>
+            </div>
+            <p class="no-taunt" id="no-taunt">Catch me if you can! 😉 Only YES is written in our stars! 💜</p>
+        </div>
+    </div>
+
+    <!-- HAPPY LOVE ENDING CELEBRATION MODAL -->
+    <div class="celebration-overlay" id="celebration-modal">
+        <div class="celebration-card">
+            <div class="heart-icon-badge">💖</div>
+            <h2 class="celebration-names">Mahmoud &amp; Afsana</h2>
+            <p class="celebration-subtitle">Happy Love Ending · Forever &amp; Always 💜</p>
+            <div class="celebration-quote">
+                "From a quiet tree in spring, through valleys of blooming flowers, to the purple ocean of the BTS concert... Every step was leading us to this moment. Yes, Mahmoud! A million times YES!"
+            </div>
+            <button class="replay-btn" id="btn-replay" type="button">↺ Relive Our Journey</button>
+        </div>
+    </div>
+
+    <!-- Story Script -->
+    <script>
+        (() => {
+            "use strict";
+
+            // DOM Elements
+            const canvas = document.getElementById("scene");
+            const ctx = canvas.getContext("2d");
+            const nextButton = document.getElementById("next");
+            const nextText = document.getElementById("next-text");
+            const nextSymbol = document.getElementById("next-symbol");
+            const resetButton = document.getElementById("reset");
+            const heading = document.getElementById("heading");
+            const title = document.getElementById("title");
+            const subtitle = document.getElementById("subtitle");
+            const eyebrow = document.getElementById("eyebrow");
+            const chapterLabel = document.getElementById("chapter-label");
+            const dots = [...document.querySelectorAll("#progress-dots span")];
+            const audioToggle = document.getElementById("audio-toggle");
+            const audioStatus = document.getElementById("audio-status");
+            const audioIcon = document.getElementById("audio-icon");
+            const proposalModal = document.getElementById("proposal-modal");
+            const btnYes = document.getElementById("btn-yes");
+            const btnNo = document.getElementById("btn-no");
+            const noTaunt = document.getElementById("no-taunt");
+            const celebrationModal = document.getElementById("celebration-modal");
+            const btnReplay = document.getElementById("btn-replay");
+
+            // Screen & Audio Dimensions
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            let stage = 0; // 0: Tree Resting, 1: Waking & Get Down, 2: Meet Afsana, 3: Flower Paradise, 4: BTS Concert, 5: Proposal, 6: Happy Ending
+            let busy = false;
+            let animation = null;
+            let elapsed = 0;
+            let lastFrame = 0;
+            let frame = 0;
+            let headingTimer = 0;
+
+            // Audio Synthesizer (Zero External Dependencies)
+            let audioCtx = null;
+            let soundEnabled = true;
+
+            function initAudio() {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === "suspended") {
+                    audioCtx.resume();
+                }
+            }
+
+            function playChime(freq = 440, type = "sine", duration = 0.8, gainVal = 0.15) {
+                if (!soundEnabled || !audioCtx) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch (e) {}
+            }
+
+            function playChord(notes, duration = 1.2) {
+                if (!soundEnabled || !audioCtx) return;
+                notes.forEach((f, i) => {
+                    setTimeout(() => playChime(f, "triangle", duration, 0.12), i * 90);
+                });
+            }
+
+            function playConcertVibe() {
+                if (!soundEnabled || !audioCtx) return;
+                playChord([220, 277.18, 329.63, 440, 554.37], 2.0);
+            }
+
+            function playLoveFanfare() {
+                if (!soundEnabled || !audioCtx) return;
+                const melody = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                melody.forEach((freq, idx) => {
+                    setTimeout(() => {
+                        playChime(freq, "sine", 1.8, 0.2);
+                    }, idx * 120);
+                });
+            }
+
+            audioToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                initAudio();
+                soundEnabled = !soundEnabled;
+                audioStatus.textContent = soundEnabled ? "Sound" : "Muted";
+                audioIcon.textContent = soundEnabled ? "♪" : "✕";
+                if (soundEnabled) playChime(587.33);
+            });
+
+            // Math & Lerp Utilities
+            const TAU = Math.PI * 2;
+            const clamp = v => Math.max(0, Math.min(1, v));
+            const mix = (a, b, t) => a + (b - a) * t;
+            const smooth = t => (t = clamp(t), t * t * (3 - 2 * t));
+            const smoother = t => (t = clamp(t), t * t * t * (t * (t * 6 - 15) + 10));
+            const phase = (t, start, end) => clamp((t - start) / (end - start));
+
+            let seed = 987123;
+            function random() {
+                seed = (seed * 16807) % 2147483647;
+                return (seed - 1) / 2147483646;
+            }
+            const range = (a, b) => mix(a, b, random());
+
+            // Camera Setup
+            let camera = { x: 0, y: -85, scale: 1, anchor: 0.57 };
+            const GROUND = 235;
+
+            // Blossom & Nature Assets
+            const branches = [];
+            const treeFlowers = [];
+            const grass = [];
+            const ambientPetals = [];
+            const flowerMeadow = [];
+            const concertLights = [];
+            const fireworks = [];
+            const celebrationHearts = [];
+
+            // Generate Tree Branches
+            function createBranch(x, y, length, angle, thickness, depth) {
+                const endX = x + Math.cos(angle) * length;
+                const endY = y + Math.sin(angle) * length;
+                branches.push({
+                    x, y, endX, endY,
+                    cx: (x + endX) / 2 + range(-10, 10),
+                    cy: (y + endY) / 2,
+                    thickness
+                });
+
+                if (depth <= 2) {
+                    const count = depth === 0 ? 14 : 7;
+                    for (let i = 0; i < count; i++) {
+                        const a = range(0, TAU);
+                        const r = Math.sqrt(random()) * 26;
+                        treeFlowers.push({
+                            x: endX + Math.cos(a) * r,
+                            y: endY + Math.sin(a) * r * 0.8,
+                            size: range(6, 12),
+                            rotation: range(0, TAU),
+                            variant: Math.floor(range(0, 5)),
+                            delay: range(0.1, 2.5)
+                        });
+                    }
+                }
+                if (!depth) return;
+                createBranch(endX, endY, length * range(0.68, 0.8), angle - range(0.3, 0.55), thickness * 0.67, depth - 1);
+                createBranch(endX, endY, length * range(0.68, 0.8), angle + range(0.3, 0.55), thickness * 0.65, depth - 1);
+            }
+
+            createBranch(-10, -48, 116, -2.11, 21, 5);
+            createBranch(-7, -67, 121, -1.49, 23, 5);
+            createBranch(30, -81, 109, -0.87, 18, 5);
+            createBranch(-23, -8, 101, -2.65, 14, 4);
+
+            // Generate Grass
+            for (let i = 0; i < 140; i++) {
+                grass.push({
+                    x: range(-700, 700),
+                    y: range(232, 275),
+                    length: range(4, 15),
+                    bend: range(-6, 6),
+                    alpha: range(0.15, 0.35)
+                });
+            }
+
+            // Generate Falling & Meadow Petals
+            for (let i = 0; i < 60; i++) {
+                ambientPetals.push({
+                    x: range(-500, 600),
+                    y: range(-450, 320),
+                    speed: range(12, 26),
+                    drift: range(10, 24),
+                    phase: range(0, TAU),
+                    size: range(2, 4.5),
+                    color: ["#fbcfe8", "#f472b6", "#e879f9", "#c084fc", "#fff1f2"][Math.floor(range(0, 5))]
+                });
+            }
+
+            // Generate Rich Flower Field (for Flower Paradise Stage)
+            const floralPalette = ["#f43f5e", "#ec4899", "#d946ef", "#a855f7", "#8b5cf6", "#fbbf24", "#fb7185", "#f472b6", "#fef08a", "#e9d5ff"];
+            for (let i = 0; i < 260; i++) {
+                flowerMeadow.push({
+                    x: range(-800, 800),
+                    y: range(190, 280),
+                    height: range(12, 36),
+                    size: range(6, 15),
+                    color: floralPalette[Math.floor(range(0, floralPalette.length))],
+                    swayPhase: range(0, TAU),
+                    type: Math.floor(range(0, 4))
+                });
+            }
+
+            // Generate BTS Concert Lights & Army Bombs
+            for (let i = 0; i < 160; i++) {
+                concertLights.push({
+                    x: range(-650, 650),
+                    y: range(180, 290),
+                    size: range(2.5, 6),
+                    color: ["#c084fc", "#a855f7", "#d8b4fe", "#e879f9", "#ffffff", "#9333ea"][Math.floor(range(0, 6))],
+                    blinkPhase: range(0, TAU),
+                    waveOffset: range(-2, 2)
+                });
+            }
+
+            // Blossom Sprites
+            const blossomColors = ["#f5c9d5", "#edb7c7", "#f9dce3", "#dfa1b8", "#fff0ed"];
+            const blossomSprites = blossomColors.map(color => {
+                const img = document.createElement("canvas");
+                img.width = img.height = 64;
+                const c = img.getContext("2d");
+                c.translate(32, 32);
+                for (let i = 0; i < 5; i++) {
+                    c.save();
+                    c.rotate(i * TAU / 5);
+                    c.fillStyle = color;
+                    c.beginPath();
+                    c.ellipse(0, -10, 8, 13, 0, 0, TAU);
+                    c.fill();
+                    c.restore();
+                }
+                c.fillStyle = "#c48e80";
+                c.beginPath();
+                c.arc(0, 0, 2.6, 0, TAU);
+                c.fill();
+                return img;
+            });
+
+            // Particle Triggers
+            function triggerFireworks(x, y, count = 35) {
+                const colors = ["#f43f5e", "#ec4899", "#d946ef", "#a855f7", "#c084fc", "#fef08a", "#67e8f9"];
+                for (let i = 0; i < count; i++) {
+                    const angle = range(0, TAU);
+                    const speed = range(35, 140);
+                    fireworks.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        alpha: 1,
+                        decay: range(0.4, 0.8),
+                        size: range(3, 6),
+                        color: colors[Math.floor(range(0, colors.length))]
+                    });
+                }
+            }
+
+            function triggerHearts(x, y, count = 14) {
+                for (let i = 0; i < count; i++) {
+                    celebrationHearts.push({
+                        x: x + range(-35, 35),
+                        y: y + range(-15, 15),
+                        vy: range(-40, -85),
+                        vx: range(-18, 18),
+                        size: range(10, 22),
+                        alpha: 1,
+                        decay: range(0.3, 0.55),
+                        phase: range(0, TAU)
+                    });
+                }
+            }
+
+            // Poses & Articulations
+            const standing = {
+                head: [0, -75], neck: [0, -62], hip: [0, -35],
+                shoulderL: [-8, -59], shoulderR: [8, -59],
+                elbowL: [-12, -44], handL: [-10, -33],
+                elbowR: [12, -44], handR: [10, -33],
+                kneeL: [-7, -18], footL: [-8, 0],
+                kneeR: [7, -18], footR: [8, 0]
+            };
+
+            const sleeping = {
+                head: [-101, -68], neck: [-88, -57], hip: [-52, -23],
+                shoulderL: [-88, -55], shoulderR: [-77, -52],
+                elbowL: [-109, -67], handL: [-109, -78],
+                elbowR: [-68, -33], handR: [-57, -36],
+                kneeL: [-30, -23], footL: [-4, -2],
+                kneeR: [-32, -45], footR: [-6, -20]
+            };
+
+            const crouching = {
+                ...standing,
+                head: [7, -52], neck: [7, -40], hip: [0, -20],
+                shoulderL: [-1, -38], shoulderR: [15, -38],
+                elbowL: [-15, -25], handL: [-18, -12],
+                elbowR: [20, -25], handR: [22, -12],
+                kneeL: [-15, -11], kneeR: [16, -10]
+            };
+
+            const jumping = {
+                ...standing,
+                head: [0, -77],
+                shoulderL: [-8, -60], shoulderR: [8, -60],
+                elbowL: [-23, -72], handL: [-31, -85],
+                elbowR: [23, -72], handR: [31, -85],
+                kneeL: [-14, -20], footL: [-20, -4],
+                kneeR: [15, -24], footR: [22, -11]
+            };
+
+            function copyPose(pose) {
+                return Object.fromEntries(Object.entries(pose).map(([k, v]) => [k, [...v]]));
+            }
+
+            function blendPose(a, b, t) {
+                const p = {};
+                for (const k of Object.keys(a)) {
+                    p[k] = [mix(a[k][0], b[k][0], t), mix(a[k][1], b[k][1], t)];
+                }
+                return p;
+            }
+
+            function walkingPose(time, strength = 1) {
+                const pose = copyPose(standing);
+                const stride = Math.sin(time) * strength;
+                pose.footL = [-7 + stride * 10, -Math.max(0, stride) * 4];
+                pose.footR = [7 - stride * 10, -Math.max(0, -stride) * 4];
+                pose.kneeL = [-7 + stride * 5, -18];
+                pose.kneeR = [7 - stride * 5, -18];
+                pose.handL[0] -= stride * 7;
+                pose.handR[0] += stride * 7;
+                pose.elbowL[0] -= stride * 4;
+                pose.elbowR[0] += stride * 4;
+                return pose;
+            }
+
+            // Primitive Drawing Helpers
+            function drawEllipse(x, y, rx, ry, color, rotation = 0) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.ellipse(x, y, rx, ry, rotation, 0, TAU);
+                ctx.fill();
+            }
+
+            function drawLine(points, color, thickness) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = thickness;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.beginPath();
+                ctx.moveTo(points[0][0], points[0][1]);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i][0], points[i][1]);
+                }
+                ctx.stroke();
+            }
+
+            function drawPolygon(points, color) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(points[0][0], points[0][1]);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i][0], points[i][1]);
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            function drawHeart(x, y, size, alpha = 1, color = "#ec4899") {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(size / 20, size / 20);
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(0, 8);
+                ctx.bezierCurveTo(-24, -6, -12, -23, 0, -12);
+                ctx.bezierCurveTo(12, -23, 24, -6, 0, 8);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Responsive Speech Bubble Renderer
+            function drawSpeechBubble(x, y, text, tailDirection = "down", alpha = 1) {
+                if (!text || alpha <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                const isMobile = width < 600;
+                const fontSize = isMobile ? 11.5 : 13;
+                ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
+                const paddingX = isMobile ? 10 : 13;
+                const paddingY = isMobile ? 6 : 8;
+                const metrics = ctx.measureText(text);
+                const boxW = metrics.width + paddingX * 2;
+                const boxH = isMobile ? 24 : 27;
+                const bx = x - boxW / 2;
+                const by = y - boxH - (isMobile ? 8 : 11);
+
+                // Glowing drop shadow & pill background
+                ctx.shadowColor = "rgba(0,0,0,0.35)";
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = "rgba(20, 10, 32, 0.94)";
+                ctx.strokeStyle = "rgba(244, 160, 220, 0.9)";
+                ctx.lineWidth = 1.3;
+
+                ctx.beginPath();
+                ctx.roundRect(bx, by, boxW, boxH, 12);
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Bubble Tail
+                ctx.fillStyle = "rgba(20, 10, 32, 0.94)";
+                ctx.beginPath();
+                if (tailDirection === "down") {
+                    ctx.moveTo(x - 4, by + boxH - 1);
+                    ctx.lineTo(x + 4, by + boxH - 1);
+                    ctx.lineTo(x, by + boxH + 6);
+                }
+                ctx.fill();
+
+                // Text
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(text, x, by + boxH / 2);
+
+                ctx.restore();
+            }
+
+            // Responsive Name Tag Renderer (Floating above Character's Head)
+            function drawNameTag(x, y, name, type = "boy") {
+                ctx.save();
+                const isMobile = width < 600;
+                const fontSize = isMobile ? 9.5 : 10.5;
+                ctx.font = `700 ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
+                const icon = type === "boy" ? "👑 " : "🌸 ";
+                const fullText = icon + name;
+                const textWidth = ctx.measureText(fullText).width;
+                const tagW = textWidth + (isMobile ? 14 : 16);
+                const tagH = isMobile ? 18 : 20;
+                const tagX = x - tagW / 2;
+                const tagY = y - tagH - 5;
+
+                // Glowing pill
+                const glowColor = type === "boy" ? "rgba(96, 165, 250, 0.5)" : "rgba(244, 114, 182, 0.5)";
+                const bgGrad = ctx.createLinearGradient(tagX, tagY, tagX + tagW, tagY + tagH);
+                if (type === "boy") {
+                    bgGrad.addColorStop(0, "rgba(24, 40, 72, 0.9)");
+                    bgGrad.addColorStop(1, "rgba(15, 23, 42, 0.95)");
+                } else {
+                    bgGrad.addColorStop(0, "rgba(76, 20, 54, 0.9)");
+                    bgGrad.addColorStop(1, "rgba(40, 10, 30, 0.95)");
+                }
+
+                ctx.shadowColor = glowColor;
+                ctx.shadowBlur = 6;
+                ctx.fillStyle = bgGrad;
+                ctx.strokeStyle = type === "boy" ? "rgba(147, 197, 253, 0.85)" : "rgba(249, 168, 212, 0.85)";
+                ctx.lineWidth = 1.1;
+
+                ctx.beginPath();
+                ctx.roundRect(tagX, tagY, tagW, tagH, 9);
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Name Text
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(fullText, x, tagY + tagH / 2);
+
+                ctx.restore();
+            }
+
+            // Character Drawing Engine
+            function drawPerson(x, y, pose, {
+                girl = false,
+                asleep = false,
+                direction = 1,
+                blush = 0,
+                headTilt = 0,
+                flower = false,
+                name = "",
+                speech = "",
+                speechAlpha = 1
+            } = {}) {
+                const skin = girl ? "#f2c7b5" : "#e5b994";
+                const shirt = girl ? (stage >= 4 ? "#9333ea" : "#d39aae") : (stage >= 4 ? "#1e1b4b" : "#4338ca");
+                const sleeve = girl ? (stage >= 4 ? "#a855f7" : "#d9a5b6") : (stage >= 4 ? "#312e81" : "#4f46e5");
+                const pants = stage >= 4 ? "#0f172a" : "#334155";
+                const hair = girl ? "#451a03" : "#1e1b18";
+
+                ctx.save();
+                ctx.translate(x, y);
+
+                const p = pose;
+
+                // Hair back for girl
+                if (girl) {
+                    drawEllipse(p.head[0], p.head[1] + 11, 14, 23, hair, -0.04);
+                }
+
+                // Legs
+                drawLine([p.hip, p.kneeL, p.footL], girl ? skin : pants, girl ? 5 : 7.5);
+                drawLine([p.hip, p.kneeR, p.footR], girl ? skin : "#475569", girl ? 5 : 7.5);
+
+                drawEllipse(p.footL[0] + direction * 2, p.footL[1], 7, 3.2, girl ? "#831843" : "#0f172a");
+                drawEllipse(p.footR[0] + direction * 2, p.footR[1], 7, 3.2, girl ? "#831843" : "#0f172a");
+
+                // Far Arm
+                drawLine([p.shoulderL, p.elbowL], sleeve, 7);
+                drawLine([p.elbowL, p.handL], skin, 4.5);
+
+                // Torso / Dress
+                const shoulderCenter = [(p.shoulderL[0] + p.shoulderR[0]) / 2, (p.shoulderL[1] + p.shoulderR[1]) / 2];
+                const dx = p.hip[0] - shoulderCenter[0];
+                const dy = p.hip[1] - shoulderCenter[1];
+                const length = Math.hypot(dx, dy) || 1;
+                const normal = [-dy / length, dx / length];
+
+                drawPolygon([
+                    [shoulderCenter[0] + normal[0] * 9, shoulderCenter[1] + normal[1] * 9],
+                    [shoulderCenter[0] - normal[0] * 9, shoulderCenter[1] - normal[1] * 9],
+                    [p.hip[0] - normal[0] * 9, p.hip[1] - normal[1] * 9],
+                    [p.hip[0] + normal[0] * 9, p.hip[1] + normal[1] * 9]
+                ], shirt);
+
+                if (girl) {
+                    drawPolygon([
+                        [p.hip[0] - 8, p.hip[1] - 6],
+                        [p.hip[0] + 8, p.hip[1] - 6],
+                        [p.hip[0] + 19, p.hip[1] + 18],
+                        [p.hip[0] - 18, p.hip[1] + 18]
+                    ], stage >= 4 ? "#c084fc" : "#e879f9");
+                }
+
+                drawLine([p.neck, [p.head[0], p.head[1] + 9]], skin, 6);
+
+                // Near Arm
+                drawLine([p.shoulderR, p.elbowR], sleeve, 7);
+                drawLine([p.elbowR, p.handR], skin, 4.5);
+                drawEllipse(p.handR[0], p.handR[1], 2.8, 3, skin);
+
+                // Head
+                ctx.save();
+                ctx.translate(p.head[0], p.head[1]);
+                ctx.rotate(headTilt);
+
+                drawEllipse(0, 0, 11, 13.5, skin);
+
+                // Hair Front
+                if (girl) {
+                    ctx.fillStyle = hair;
+                    ctx.beginPath();
+                    ctx.moveTo(-11, 4);
+                    ctx.bezierCurveTo(-16, -12, -7, -18, 3, -14);
+                    ctx.bezierCurveTo(14, -13, 14, -2, 11, 10);
+                    ctx.lineTo(7, 8);
+                    ctx.lineTo(7, -5);
+                    ctx.quadraticCurveTo(-1, -4, -5, -10);
+                    ctx.lineTo(-8, 3);
+                    ctx.fill();
+                    ctx.drawImage(blossomSprites[4], 5, -12, 10, 10);
+                } else {
+                    ctx.fillStyle = hair;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, 5);
+                    ctx.bezierCurveTo(-18, -10, -7, -18, 4, -14);
+                    ctx.quadraticCurveTo(15, -12, 11, -3);
+                    ctx.lineTo(5, -7);
+                    ctx.lineTo(1, -3);
+                    ctx.lineTo(-4, -8);
+                    ctx.lineTo(-8, 2);
+                    ctx.fill();
+                }
+
+                // Eyes & Expression
+                const eyeX = direction * 4.5;
+                if (asleep) {
+                    drawLine([[eyeX - 2, 2], [eyeX + 1.5, 2.8]], "#6f5148", 1);
+                } else {
+                    drawEllipse(eyeX, 1.5, 1, 1.3, "#1e1b18");
+                    drawLine([[eyeX - 2, -1.5], [eyeX + 1, -1.8]], "#77564b", 0.8);
+                }
+
+                // Smile
+                ctx.strokeStyle = "#a66f65";
+                ctx.lineWidth = 0.9;
+                ctx.beginPath();
+                ctx.moveTo(direction * 3, 8);
+                ctx.quadraticCurveTo(direction * 5, 9.8, direction * 6.5, 7.8);
+                ctx.stroke();
+
+                if (blush > 0) {
+                    drawEllipse(direction * 4, 5.4, 3.5, 1.8, `rgba(244, 63, 94, ${blush * 0.45})`);
+                }
+
+                ctx.restore();
+
+                // Hand Blossom or BTS Lightstick
+                if (flower) {
+                    const hand = p.handR;
+                    if (stage >= 4) {
+                        drawLine([[hand[0], hand[1]], [hand[0] + 3, hand[1] - 16]], "#0f172a", 2.5);
+                        drawEllipse(hand[0] + 3, hand[1] - 18, 6, 6, "rgba(192, 132, 252, 0.9)");
+                        drawEllipse(hand[0] + 3, hand[1] - 18, 9, 9, "rgba(168, 85, 247, 0.35)");
+                    } else {
+                        drawLine([[hand[0], hand[1]], [hand[0] + 2, hand[1] - 13]], "#82956e", 1);
+                        ctx.drawImage(blossomSprites[2], hand[0] - 5, hand[1] - 22, 16, 16);
+                    }
+                }
+
+                ctx.restore();
+
+                // Render Name Tag right at the top of the character's head
+                if (name) {
+                    const headScreenX = x + p.head[0];
+                    const headScreenY = y + p.head[1] - 8;
+                    drawNameTag(headScreenX, headScreenY, name, girl ? "girl" : "boy");
+                }
+
+                // Render Character Words / Speech Bubble right above character
+                if (speech) {
+                    const speechX = x + p.head[0];
+                    const speechY = y + p.head[1] - 26;
+                    drawSpeechBubble(speechX, speechY, speech, "down", speechAlpha);
+                }
+            }
+
+            // Story State & Progress Tracker
+            let storyProgress = 0;
+
+            function getBoyState() {
+                if (stage === 0) {
+                    const breathing = Math.sin(elapsed * 1.5) * 0.4;
+                    return {
+                        x: 100, y: -65 + breathing,
+                        pose: sleeping, asleep: true, headTilt: -0.55,
+                        name: "Mahmoud", speech: ""
+                    };
+                }
+
+                if (stage === 1) {
+                    const p = storyProgress;
+                    if (p < 0.4) {
+                        const t = smooth(phase(p, 0, 0.4));
+                        return {
+                            x: mix(100, 83, t),
+                            y: mix(-65, -93, t),
+                            pose: blendPose(sleeping, standing, t),
+                            asleep: p < 0.1,
+                            headTilt: mix(-0.55, 0.1, t),
+                            name: "Mahmoud",
+                            speech: "what was that",
+                            speechAlpha: smooth(phase(p, 0.08, 0.35))
+                        };
+                    }
+                    if (p < 0.52) {
+                        return {
+                            x: 83, y: -93,
+                            pose: blendPose(standing, crouching, smooth(phase(p, 0.4, 0.52))),
+                            name: "Mahmoud", speech: ""
+                        };
+                    }
+                    if (p < 0.85) {
+                        const t = phase(p, 0.52, 0.85);
+                        const airPose = blendPose(crouching, jumping, smooth(t * 5));
+                        const landingPrep = smooth(phase(t, 0.8, 1));
+                        return {
+                            x: mix(83, 122, t),
+                            y: mix(-93, GROUND, t * t) - Math.sin(Math.PI * t) * 70,
+                            pose: blendPose(airPose, crouching, landingPrep),
+                            name: "Mahmoud", speech: ""
+                        };
+                    }
+                    return {
+                        x: 122, y: GROUND,
+                        pose: blendPose(crouching, standing, smooth(phase(p, 0.85, 1))),
+                        name: "Mahmoud", speech: ""
+                    };
+                }
+
+                if (stage === 2) {
+                    const holding = smooth(phase(storyProgress, 0.65, 1));
+                    const pose = copyPose(standing);
+                    pose.elbowR = [mix(12, 18, holding), mix(-44, -42, holding)];
+                    pose.handR = [mix(10, 22, holding), mix(-33, -38, holding)];
+                    return {
+                        x: mix(122, 110, holding),
+                        y: GROUND,
+                        pose,
+                        headTilt: holding * 0.08,
+                        blush: holding,
+                        name: "Mahmoud",
+                        speech: storyProgress > 0.6 ? "Afsana...?" : "",
+                        speechAlpha: smooth(phase(storyProgress, 0.6, 0.85))
+                    };
+                }
+
+                if (stage === 3) {
+                    const walk = walkingPose(elapsed * 4.5, 0.85);
+                    walk.elbowR = [18, -42];
+                    walk.handR = [22, -38];
+                    return {
+                        x: 95, y: GROUND,
+                        pose: walk,
+                        blush: 0.8,
+                        name: "Mahmoud",
+                        speech: "It's so beautiful here! 🌸",
+                        speechAlpha: Math.sin(elapsed * 2) > 0 ? 0.9 : 0.7
+                    };
+                }
+
+                if (stage >= 4) {
+                    const dance = walkingPose(elapsed * 3, 0.4);
+                    dance.elbowR = [16, -45];
+                    dance.handR = [22, -40];
+                    const isAsking = stage === 4;
+                    return {
+                        x: 98, y: GROUND,
+                        pose: dance,
+                        blush: 1,
+                        name: "Mahmoud",
+                        speech: isAsking ? "Afsana, will you go on a date with me? 💜" : "My universe! 💜",
+                        speechAlpha: 1
+                    };
+                }
+
+                return { x: 122, y: GROUND, pose: standing, name: "Mahmoud" };
+            }
+
+            function getGirlState() {
+                if (stage < 2) return null;
+
+                if (stage === 2) {
+                    const approach = smoother(phase(storyProgress, 0, 0.75));
+                    const girlX = mix(370, 158, approach);
+                    const walkingStr = smooth(phase(storyProgress, 0, 0.15)) * (1 - smooth(phase(storyProgress, 0.6, 0.8)));
+                    const pose = walkingPose(storyProgress * 38, walkingStr);
+                    const holding = smooth(phase(storyProgress, 0.65, 1));
+
+                    pose.elbowL = [mix(-12, -18, holding), mix(-44, -42, holding)];
+                    pose.handL = [mix(-10, -22, holding), mix(-33, -38, holding)];
+                    pose.elbowR = [12, -46];
+                    pose.handR = [12, -39];
+
+                    return {
+                        x: girlX, y: GROUND,
+                        pose,
+                        direction: -1,
+                        blush: holding,
+                        headTilt: -holding * 0.08,
+                        flower: true,
+                        name: "Afsana",
+                        speech: "You are not who you are",
+                        speechAlpha: smooth(phase(storyProgress, 0.3, 0.9))
+                    };
+                }
+
+                if (stage === 3) {
+                    const walk = walkingPose(elapsed * 4.5, 0.85);
+                    walk.elbowL = [-18, -42];
+                    walk.handL = [-22, -38];
+                    walk.elbowR = [12, -46];
+                    walk.handR = [12, -39];
+                    return {
+                        x: 142, y: GROUND,
+                        pose: walk,
+                        direction: -1,
+                        blush: 0.9,
+                        flower: true,
+                        name: "Afsana",
+                        speech: "Look at all these flowers! ✨",
+                        speechAlpha: Math.sin(elapsed * 2) < 0 ? 0.9 : 0.7
+                    };
+                }
+
+                if (stage >= 4) {
+                    const wave = walkingPose(elapsed * 3, 0.4);
+                    wave.elbowL = [-16, -45];
+                    wave.handL = [-22, -40];
+                    wave.elbowR = [15, -60];
+                    wave.handR = [18, -75];
+                    const isHappyEnding = stage === 6;
+                    return {
+                        x: 144, y: GROUND,
+                        pose: wave,
+                        direction: -1,
+                        blush: 1,
+                        flower: true,
+                        name: "Afsana",
+                        speech: isHappyEnding ? "YES! A million times YES! 💜" : "The BTS purple ocean! 💜",
+                        speechAlpha: 1
+                    };
+                }
+                return null;
+            }
+
+            // Background Renderers for Different Stages
+            function drawSceneBackground() {
+                if (stage <= 2) {
+                    const sky = ctx.createLinearGradient(0, 0, 0, height);
+                    sky.addColorStop(0, "#2c1938");
+                    sky.addColorStop(0.45, "#4a244b");
+                    sky.addColorStop(0.8, "#834168");
+                    sky.addColorStop(1, "#c0778c");
+                    ctx.fillStyle = sky;
+                    ctx.fillRect(0, 0, width, height);
+
+                    const glow = ctx.createRadialGradient(width * 0.75, height * 0.32, 0, width * 0.75, height * 0.32, width * 0.5);
+                    glow.addColorStop(0, "rgba(255, 235, 200, 0.6)");
+                    glow.addColorStop(0.5, "rgba(255, 210, 180, 0.2)");
+                    glow.addColorStop(1, "rgba(255, 210, 180, 0)");
+                    ctx.fillStyle = glow;
+                    ctx.fillRect(0, 0, width, height);
+                    drawEllipse(width * 0.75, height * 0.32, 38, 38, "rgba(255, 245, 225, 0.85)");
+
+                    for (let l = 0; l < 3; l++) {
+                        const h = height * (0.74 + l * 0.06);
+                        ctx.beginPath();
+                        ctx.moveTo(0, height);
+                        for (let x = 0; x <= width + 30; x += 30) {
+                            ctx.lineTo(x, h + Math.sin(x / (width * 0.2) + l * 1.8) * (14 + l * 8));
+                        }
+                        ctx.lineTo(width, height);
+                        ctx.closePath();
+                        ctx.fillStyle = ["rgba(90, 45, 78, 0.4)", "rgba(70, 35, 65, 0.6)", "rgba(45, 22, 45, 0.8)"][l];
+                        ctx.fill();
+                    }
+                } else if (stage === 3) {
+                    const sky = ctx.createLinearGradient(0, 0, 0, height);
+                    sky.addColorStop(0, "#3b1747");
+                    sky.addColorStop(0.4, "#7a2b63");
+                    sky.addColorStop(0.7, "#c24b6e");
+                    sky.addColorStop(1, "#fca5a5");
+                    ctx.fillStyle = sky;
+                    ctx.fillRect(0, 0, width, height);
+
+                    drawEllipse(width * 0.5, height * 0.35, 55, 55, "rgba(254, 240, 138, 0.9)");
+                    const sunGlow = ctx.createRadialGradient(width * 0.5, height * 0.35, 0, width * 0.5, height * 0.35, width * 0.6);
+                    sunGlow.addColorStop(0, "rgba(254, 215, 170, 0.5)");
+                    sunGlow.addColorStop(1, "rgba(254, 215, 170, 0)");
+                    ctx.fillStyle = sunGlow;
+                    ctx.fillRect(0, 0, width, height);
+
+                    for (let l = 0; l < 3; l++) {
+                        const h = height * (0.68 + l * 0.08);
+                        ctx.beginPath();
+                        ctx.moveTo(0, height);
+                        for (let x = 0; x <= width + 30; x += 30) {
+                            ctx.lineTo(x, h + Math.sin(x / (width * 0.18) + l * 2.2) * (18 + l * 10));
+                        }
+                        ctx.lineTo(width, height);
+                        ctx.closePath();
+                        ctx.fillStyle = ["rgba(136, 19, 55, 0.45)", "rgba(159, 18, 57, 0.65)", "rgba(190, 18, 60, 0.8)"][l];
+                        ctx.fill();
+                    }
+                } else {
+                    const stadiumSky = ctx.createLinearGradient(0, 0, 0, height);
+                    stadiumSky.addColorStop(0, "#08030f");
+                    stadiumSky.addColorStop(0.5, "#170828");
+                    stadiumSky.addColorStop(1, "#2e1065");
+                    ctx.fillStyle = stadiumSky;
+                    ctx.fillRect(0, 0, width, height);
+
+                    const screenW = Math.min(width * 0.88, 650);
+                    const screenH = width < 600 ? 110 : 135;
+                    const screenX = (width - screenW) / 2;
+                    const screenY = height * (width < 600 ? 0.14 : 0.18);
+
+                    const screenGrad = ctx.createLinearGradient(screenX, screenY, screenX, screenY + screenH);
+                    screenGrad.addColorStop(0, "rgba(147, 51, 234, 0.65)");
+                    screenGrad.addColorStop(1, "rgba(88, 28, 135, 0.92)");
+                    ctx.fillStyle = screenGrad;
+                    ctx.beginPath();
+                    ctx.roundRect(screenX, screenY, screenW, screenH, 14);
+                    ctx.fill();
+                    ctx.strokeStyle = "rgba(192, 132, 252, 0.8)";
+                    ctx.lineWidth = 1.8;
+                    ctx.stroke();
+
+                    ctx.save();
+                    ctx.fillStyle = "#ffffff";
+                    const titleSize = width < 600 ? 17 : 22;
+                    ctx.font = `800 ${titleSize}px 'Plus Jakarta Sans', sans-serif`;
+                    ctx.textAlign = "center";
+                    ctx.fillText("✦ BTS WORLD TOUR ✦", width / 2, screenY + (width < 600 ? 32 : 40));
+
+                    const subSize = width < 600 ? 11.5 : 13.5;
+                    ctx.font = `600 ${subSize}px 'Plus Jakarta Sans', sans-serif`;
+                    ctx.fillStyle = "#e9d5ff";
+                    ctx.fillText("LOVE YOURSELF · MAHMOUD & AFSANA 💜", width / 2, screenY + (width < 600 ? 60 : 72));
+
+                    ctx.font = `700 ${width < 600 ? 10 : 11.5}px 'Plus Jakarta Sans', sans-serif`;
+                    ctx.fillStyle = "#f472b6";
+                    ctx.fillText("BORAHAE (I PURPLE YOU)", width / 2, screenY + (width < 600 ? 86 : 100));
+                    ctx.restore();
+
+                    ctx.save();
+                    const beamCount = width < 600 ? 3 : 4;
+                    for (let b = -beamCount; b <= beamCount; b++) {
+                        const beamAngle = Math.sin(elapsed * 1.2 + b) * 0.45;
+                        const beamOriginX = width / 2 + b * (width < 600 ? 40 : 55);
+                        const beamOriginY = screenY + screenH;
+                        ctx.strokeStyle = b % 2 === 0 ? "rgba(168, 85, 247, 0.25)" : "rgba(236, 72, 153, 0.25)";
+                        ctx.lineWidth = width < 600 ? 5 : 7;
+                        ctx.beginPath();
+                        ctx.moveTo(beamOriginX, beamOriginY);
+                        ctx.lineTo(beamOriginX + Math.tan(beamAngle) * 500, height);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            // Draw Ground / Flower Field / Concert Stage
+            function drawEnvironment() {
+                if (stage <= 2) {
+                    drawEllipse(0, 247, 400, 28, "rgba(45, 18, 40, 0.7)");
+                    for (const g of grass) {
+                        const sway = Math.sin(elapsed * 2 + g.x) * 1.5;
+                        ctx.strokeStyle = `rgba(180, 100, 140, ${g.alpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(g.x, g.y);
+                        ctx.quadraticCurveTo(g.x + g.bend, g.y - g.length * 0.5, g.x + g.bend + sway, g.y - g.length);
+                        ctx.stroke();
+                    }
+                } else if (stage === 3) {
+                    drawEllipse(0, 245, 450, 32, "rgba(80, 15, 45, 0.8)");
+                    for (const fl of flowerMeadow) {
+                        const sway = Math.sin(elapsed * 2.5 + fl.swayPhase) * 3;
+                        ctx.strokeStyle = "#4d7c0f";
+                        ctx.lineWidth = 1.3;
+                        ctx.beginPath();
+                        ctx.moveTo(fl.x, fl.y);
+                        ctx.quadraticCurveTo(fl.x + sway * 0.5, fl.y - fl.height * 0.6, fl.x + sway, fl.y - fl.height);
+                        ctx.stroke();
+
+                        ctx.fillStyle = fl.color;
+                        ctx.beginPath();
+                        ctx.arc(fl.x + sway, fl.y - fl.height, fl.size * 0.55, 0, TAU);
+                        ctx.fill();
+
+                        ctx.fillStyle = "#fef08a";
+                        ctx.beginPath();
+                        ctx.arc(fl.x + sway, fl.y - fl.height, fl.size * 0.2, 0, TAU);
+                        ctx.fill();
+                    }
+                } else {
+                    drawEllipse(0, 245, 450, 32, "rgba(20, 8, 38, 0.95)");
+                    for (let c = -400; c <= 400; c += 22) {
+                        const bob = Math.sin(elapsed * 3 + c * 0.1) * 3;
+                        drawEllipse(c, 240 + bob, 12, 16, "#090412");
+                    }
+                    for (const light of concertLights) {
+                        const sway = Math.sin(elapsed * 2.8 + light.blinkPhase) * 5;
+                        const pulse = (Math.sin(elapsed * 4 + light.blinkPhase) + 1) * 0.5;
+                        drawEllipse(light.x + sway, light.y, light.size * (0.8 + pulse * 0.4), light.size * (0.8 + pulse * 0.4), light.color);
+                        drawEllipse(light.x + sway, light.y, light.size * 2.4, light.size * 2.4, "rgba(168, 85, 247, 0.18)");
+                    }
+                }
+            }
+
+            // Draw Blossoming Tree (Stages 0-2)
+            function drawTreeScene() {
+                if (stage > 2) return;
+
+                for (const b of branches) {
+                    ctx.strokeStyle = b.thickness > 6 ? "#5c2e42" : "#7d3e5a";
+                    ctx.lineWidth = b.thickness;
+                    ctx.lineCap = "round";
+                    ctx.beginPath();
+                    ctx.moveTo(b.x, b.y);
+                    ctx.quadraticCurveTo(b.cx, b.cy, b.endX, b.endY);
+                    ctx.stroke();
+                }
+
+                const bark = ctx.createLinearGradient(-45, 0, 45, 0);
+                bark.addColorStop(0, "#4a2135");
+                bark.addColorStop(0.5, "#6b324d");
+                bark.addColorStop(1, "#8a4364");
+
+                ctx.fillStyle = bark;
+                ctx.beginPath();
+                ctx.moveTo(-48, 242);
+                ctx.bezierCurveTo(-22, 214, -28, 167, -30, 130);
+                ctx.bezierCurveTo(-34, 72, -17, 20, -22, -18);
+                ctx.bezierCurveTo(-34, -57, -29, -88, -10, -112);
+                ctx.lineTo(8, -109);
+                ctx.bezierCurveTo(-7, -63, 3, -46, 15, -32);
+                ctx.bezierCurveTo(26, -57, 45, -84, 64, -100);
+                ctx.lineTo(74, -91);
+                ctx.bezierCurveTo(46, -53, 35, -21, 24, 15);
+                ctx.bezierCurveTo(7, 91, 14, 153, 20, 208);
+                ctx.quadraticCurveTo(22, 230, 51, 244);
+                ctx.quadraticCurveTo(11, 235, -1, 240);
+                ctx.quadraticCurveTo(-24, 231, -48, 242);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(-10, -32);
+                ctx.bezierCurveTo(27, -58, 63, -44, 110, -72);
+                ctx.bezierCurveTo(147, -92, 166, -122, 180, -144);
+                ctx.lineTo(173, -149);
+                ctx.bezierCurveTo(141, -115, 119, -104, 87, -95);
+                ctx.bezierCurveTo(38, -86, 17, -95, -6, -81);
+                ctx.closePath();
+                ctx.fill();
+
+                for (const fl of treeFlowers) {
+                    const sway = Math.sin(elapsed * 0.8 + fl.x * 0.02) * 1.2;
+                    ctx.save();
+                    ctx.translate(fl.x + sway, fl.y);
+                    ctx.rotate(fl.rotation);
+                    ctx.drawImage(blossomSprites[fl.variant], -fl.size, -fl.size, fl.size * 2, fl.size * 2);
+                    ctx.restore();
+                }
+
+                ctx.save();
+                ctx.translate(126, -105);
+                ctx.rotate(-0.32);
+                ctx.fillStyle = "#3b82f6";
+                ctx.fillRect(-9, -3, 20, 7);
+                ctx.fillStyle = "#fef3c7";
+                ctx.fillRect(-7, -1, 17, 3);
+                ctx.restore();
+            }
+
+            function drawAwakeningOrb() {
+                if (stage === 1 && storyProgress < 0.4) {
+                    const orbX = 85 + Math.sin(elapsed * 4) * 15;
+                    const orbY = -95 + Math.cos(elapsed * 3) * 12;
+                    const glowGrad = ctx.createRadialGradient(orbX, orbY, 0, orbX, orbY, 28);
+                    glowGrad.addColorStop(0, "rgba(250, 204, 21, 1)");
+                    glowGrad.addColorStop(0.4, "rgba(244, 114, 182, 0.6)");
+                    glowGrad.addColorStop(1, "rgba(244, 114, 182, 0)");
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(orbX, orbY, 28, 0, TAU);
+                    ctx.fill();
+                    drawEllipse(orbX, orbY, 4, 4, "#ffffff");
+                }
+            }
+
+            function drawParticles() {
+                for (const p of ambientPetals) {
+                    const y = ((p.y + 450 + elapsed * p.speed) % 780) - 450;
+                    const x = p.x + Math.sin(elapsed * 0.6 + p.phase) * p.drift;
+                    drawEllipse(x, y, p.size, p.size * 0.5, p.color, p.phase + elapsed);
+                }
+
+                for (let i = fireworks.length - 1; i >= 0; i--) {
+                    const fw = fireworks[i];
+                    fw.x += fw.vx * 0.016;
+                    fw.y += fw.vy * 0.016;
+                    fw.vy += 40 * 0.016;
+                    fw.alpha -= fw.decay * 0.016;
+                    if (fw.alpha <= 0) {
+                        fireworks.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = fw.alpha;
+                    drawEllipse(fw.x, fw.y, fw.size, fw.size, fw.color);
+                    ctx.restore();
+                }
+
+                for (let i = celebrationHearts.length - 1; i >= 0; i--) {
+                    const h = celebrationHearts[i];
+                    h.y += h.vy * 0.016;
+                    h.x += Math.sin(elapsed * 3 + h.phase) * 1.5;
+                    h.alpha -= h.decay * 0.016;
+                    if (h.alpha <= 0) {
+                        celebrationHearts.splice(i, 1);
+                        continue;
+                    }
+                    drawHeart(h.x, h.y, h.size, h.alpha, "#f43f5e");
+                }
+            }
+
+            // Adaptive Mobile-Optimized Camera System
+            function updateCamera() {
+                const isPortrait = height > width;
+                let target = { x: 0, y: -85, scale: 1, anchor: 0.57 };
+
+                if (stage === 0) {
+                    target = {
+                        x: isPortrait ? 40 : 45,
+                        y: isPortrait ? -90 : -100,
+                        scale: isPortrait ? Math.min(width / 310, height / 560, 2.5) : Math.min(width / 320, height / 380, 3.2),
+                        anchor: isPortrait ? 0.53 : 0.53
+                    };
+                } else if (stage === 1) {
+                    const boyDown = smooth(phase(storyProgress, 0.4, 0.9));
+                    target = {
+                        x: mix(isPortrait ? 40 : 45, 110, boyDown),
+                        y: mix(isPortrait ? -90 : -100, 40, boyDown),
+                        scale: mix(
+                            isPortrait ? Math.min(width / 310, 2.5) : Math.min(width / 320, 3.2),
+                            isPortrait ? Math.min(width / 380, 2.0) : Math.min(width / 420, 2.2),
+                            boyDown
+                        ),
+                        anchor: isPortrait ? 0.56 : 0.54
+                    };
+                } else if (stage === 2) {
+                    target = {
+                        x: 135,
+                        y: 160,
+                        scale: isPortrait ? Math.min(width / 330, height / 520, 2.2) : Math.min(width / 340, height / 380, 2.6),
+                        anchor: isPortrait ? 0.57 : 0.56
+                    };
+                } else if (stage === 3) {
+                    target = {
+                        x: 120,
+                        y: 150,
+                        scale: isPortrait ? Math.min(width / 340, height / 520, 2.1) : Math.min(width / 360, height / 400, 2.4),
+                        anchor: isPortrait ? 0.57 : 0.56
+                    };
+                } else {
+                    target = {
+                        x: 120,
+                        y: 150,
+                        scale: isPortrait ? Math.min(width / 350, height / 540, 2.0) : Math.min(width / 380, height / 420, 2.3),
+                        anchor: isPortrait ? 0.57 : 0.56
+                    };
+                }
+
+                camera.x = mix(camera.x, target.x, 0.08);
+                camera.y = mix(camera.y, target.y, 0.08);
+                camera.scale = mix(camera.scale, target.scale, 0.08);
+                camera.anchor = mix(camera.anchor, target.anchor, 0.08);
+            }
+
+            // Main Frame Render Loop
+            function render() {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, width, height);
+
+                updateCamera();
+                drawSceneBackground();
+
+                ctx.save();
+                ctx.translate(width / 2, height * camera.anchor);
+                ctx.scale(camera.scale, camera.scale);
+                ctx.translate(-camera.x, -camera.y);
+
+                drawEnvironment();
+                drawTreeScene();
+                drawAwakeningOrb();
+
+                // Characters
+                const boy = getBoyState();
+                if (boy) {
+                    drawPerson(boy.x, boy.y, boy.pose, {
+                        asleep: !!boy.asleep,
+                        headTilt: boy.headTilt || 0,
+                        blush: boy.blush || 0,
+                        direction: 1,
+                        name: boy.name,
+                        speech: boy.speech,
+                        speechAlpha: boy.speechAlpha ?? 1
+                    });
+                }
+
+                const girl = getGirlState();
+                if (girl) {
+                    drawPerson(girl.x, girl.y, girl.pose, {
+                        girl: true,
+                        direction: girl.direction || -1,
+                        blush: girl.blush || 0,
+                        headTilt: girl.headTilt || 0,
+                        flower: girl.flower || false,
+                        name: girl.name,
+                        speech: girl.speech,
+                        speechAlpha: girl.speechAlpha ?? 1
+                    });
+                }
+
+                drawParticles();
+                ctx.restore();
+            }
+
+            // Story Text Copy
+            const chapterCopy = [
+                {
+                    chapter: "01 / Tree",
+                    eyebrow: "A Small Story of Spring",
+                    title: "A quiet afternoon<br>among the blossoms.",
+                    subtitle: "Mahmoud rests peacefully high in the tree branches, dreaming under the pink petals.",
+                    next: "Tap anywhere to wake Mahmoud",
+                    symbol: "✦"
+                },
+                {
+                    chapter: "02 / Awakening",
+                    eyebrow: "Something Stirs in the Air",
+                    title: "What was that?",
+                    subtitle: "A mysterious golden shimmer awakens Mahmoud. He looks around and gets down to the meadow.",
+                    next: "Tap to see who arrives",
+                    symbol: "↓"
+                },
+                {
+                    chapter: "03 / Meeting",
+                    eyebrow: "Destined Encounter",
+                    title: "You are not<br>who you are.",
+                    subtitle: "Afsana arrives carrying a spring blossom. Her words unlock something magical between them.",
+                    next: "Tap to travel together",
+                    symbol: "→"
+                },
+                {
+                    chapter: "04 / Paradise",
+                    eyebrow: "The Endless Floral Realm",
+                    title: "A journey through<br>thousands of blooms.",
+                    subtitle: "Hand in hand, Mahmoud and Afsana wander through an enchanted sea of vibrant flowers.",
+                    next: "Tap to visit the BTS Concert",
+                    symbol: "🌸"
+                },
+                {
+                    chapter: "05 / BTS Concert",
+                    eyebrow: "The Purple Ocean",
+                    title: "Under the stadium lights.",
+                    subtitle: "Surrounded by music and glowing purple ARMY bombs, Mahmoud prepares to ask a special question...",
+                    next: "Ask Afsana on a Date 💜",
+                    symbol: "💜"
+                }
+            ];
+
+            function updateStoryCopy() {
+                if (stage >= chapterCopy.length) return;
+                clearTimeout(headingTimer);
+                const info = chapterCopy[stage];
+
+                heading.classList.add("changing");
+                headingTimer = setTimeout(() => {
+                    title.innerHTML = info.title;
+                    subtitle.textContent = info.subtitle;
+                    eyebrow.textContent = info.eyebrow;
+                    chapterLabel.textContent = info.chapter;
+                    heading.classList.remove("changing");
+                }, 220);
+
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle("active", idx === stage);
+                });
+
+                nextText.textContent = info.next;
+                nextSymbol.textContent = info.symbol;
+                resetButton.hidden = stage === 0;
+            }
+
+            function setBusy(val, msg = "") {
+                busy = val;
+                nextButton.disabled = val;
+                if (val && msg) {
+                    nextText.textContent = msg;
+                    nextSymbol.textContent = "·";
+                }
+            }
+
+            function startSceneAnimation(duration, onComplete) {
+                animation = { duration, time: 0, onComplete };
+            }
+
+            // Scene Advance Logic
+            function advance() {
+                if (busy) return;
+                initAudio();
+
+                if (stage === 0) {
+                    stage = 1;
+                    storyProgress = 0;
+                    updateStoryCopy();
+                    setBusy(true, "A mysterious sound awakens him…");
+                    playChime(659.25, "sine", 1.2);
+                    startSceneAnimation(4.8, () => {
+                        setBusy(false);
+                    });
+                } else if (stage === 1) {
+                    stage = 2;
+                    storyProgress = 0;
+                    updateStoryCopy();
+                    setBusy(true, "Afsana approaches…");
+                    playChord([440, 554.37, 659.25], 1.5);
+                    startSceneAnimation(5.5, () => {
+                        setBusy(false);
+                    });
+                } else if (stage === 2) {
+                    stage = 3;
+                    storyProgress = 0;
+                    updateStoryCopy();
+                    setBusy(true, "Traveling to the flower paradise…");
+                    playChord([523.25, 659.25, 783.99, 1046.5], 2.0);
+                    startSceneAnimation(4.5, () => {
+                        setBusy(false);
+                    });
+                } else if (stage === 3) {
+                    stage = 4;
+                    storyProgress = 0;
+                    updateStoryCopy();
+                    playConcertVibe();
+                    setBusy(false);
+                } else if (stage === 4) {
+                    stage = 5;
+                    proposalModal.classList.add("active");
+                    playConcertVibe();
+                }
+            }
+
+            // RUNAWAY "NO" BUTTON (Mobile Touch & Pointer Optimized)
+            const tauntMessages = [
+                "Catch me if you can! 😉",
+                "Oops! Too slow! 💜",
+                "Error 404: NO not found!",
+                "Afsana's heart only says YES! 💖",
+                "Resistance is futile! ✨",
+                "You know you want to say YES! 🌸",
+                "Mahmoud is waiting for your YES! 💜"
+            ];
+
+            let noMoveCount = 0;
+            function moveNoButton(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                noMoveCount++;
+                playChime(350 + Math.random() * 200, "triangle", 0.15, 0.08);
+
+                const card = proposalModal.querySelector(".proposal-card");
+                const cardRect = card ? card.getBoundingClientRect() : { width: 300, height: 350 };
+                const maxW = Math.min(cardRect.width - 110, 220);
+                const maxH = 65;
+
+                const randomX = (Math.random() - 0.5) * maxW;
+                const randomY = (Math.random() - 0.5) * maxH;
+
+                btnNo.style.transform = `translate(${randomX}px, ${randomY}px) scale(0.92)`;
+                noTaunt.textContent = tauntMessages[noMoveCount % tauntMessages.length];
+                noTaunt.classList.add("active");
+            }
+
+            btnNo.addEventListener("mouseenter", moveNoButton);
+            btnNo.addEventListener("mousemove", moveNoButton);
+            btnNo.addEventListener("pointerdown", moveNoButton);
+            btnNo.addEventListener("touchstart", moveNoButton, { passive: false });
+            btnNo.addEventListener("click", moveNoButton);
+
+            // YES BUTTON -> HAPPY LOVE ENDING!
+            btnYes.addEventListener("click", () => {
+                initAudio();
+                proposalModal.classList.remove("active");
+                stage = 6;
+
+                for (let k = 0; k < 6; k++) {
+                    setTimeout(() => {
+                        triggerFireworks(width / 2 + range(-180, 180), height * 0.35 + range(-100, 100), 40);
+                    }, k * 250);
+                }
+                triggerHearts(width / 2, height * 0.45, 30);
+
+                playLoveFanfare();
+
+                setTimeout(() => {
+                    celebrationModal.classList.add("active");
+                }, 900);
+            });
+
+            // Reset & Replay
+            function resetStory() {
+                stage = 0;
+                storyProgress = 0;
+                animation = null;
+                proposalModal.classList.remove("active");
+                celebrationModal.classList.remove("active");
+                btnNo.style.transform = "none";
+                noTaunt.classList.remove("active");
+                updateStoryCopy();
+                setBusy(false);
+                nextButton.focus({ preventScroll: true });
+            }
+
+            btnReplay.addEventListener("click", resetStory);
+            resetButton.addEventListener("click", resetStory);
+
+            // Tap anywhere on canvas to advance
+            document.addEventListener("click", (e) => {
+                if (e.target.closest("button") || e.target.closest(".proposal-overlay") || e.target.closest(".celebration-overlay")) {
+                    return;
+                }
+                advance();
+            });
+
+            // Keyboard navigation
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    if (!proposalModal.classList.contains("active") && !celebrationModal.classList.contains("active")) {
+                        e.preventDefault();
+                        advance();
+                    }
+                }
+                if (e.key === "Escape") {
+                    resetStory();
+                }
+            });
+
+            // Mobile-Friendly Resize Handler
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.round(width * dpr);
+                canvas.height = Math.round(height * dpr);
+            }
+
+            window.addEventListener("resize", resize, { passive: true });
+            window.addEventListener("orientationchange", () => {
+                setTimeout(resize, 100);
+            });
+
+            // Animation Loop
+            function tick(now) {
+                const delta = lastFrame ? Math.min((now - lastFrame) / 1000, 0.05) : 0;
+                lastFrame = now;
+                elapsed += delta;
+
+                if (animation) {
+                    animation.time += delta;
+                    storyProgress = clamp(animation.time / animation.duration);
+                    if (animation.time >= animation.duration) {
+                        const cb = animation.onComplete;
+                        animation = null;
+                        storyProgress = 1;
+                        if (cb) cb();
+                    }
+                }
+
+                if (stage === 6 && Math.random() < 0.04) {
+                    triggerFireworks(width / 2 + range(-200, 200), height * 0.35 + range(-100, 70), 18);
+                }
+
+                render();
+                frame = requestAnimationFrame(tick);
+            }
+
+            // Initialize
+            resize();
+            updateStoryCopy();
+            frame = requestAnimationFrame(tick);
+        })();
+    </script>
+</body>
+
+</html>
